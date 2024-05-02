@@ -32,7 +32,7 @@ const createStateFunFact = async (req, res) => {
 
     if (VERIFIED_CODE != true) return VERIFIED;
 
-    const singleState = await State.findOne({ stateCode: req?.params?.code }).exec();
+    const singleState = await State.findOne({ stateCode: req?.params?.code.toUpperCase() }).exec();
     
     singleState.funfacts[singleState.funfacts.length] = req.body.funfact;
     const result = singleState.save();
@@ -44,7 +44,7 @@ const removeStateFunFact = async (req, res) => {
 
     if (VERIFIED_CODE != true) return VERIFIED;
 
-    const singleState = await State.findOne({ stateCode: req?.params?.code }).exec();
+    const singleState = await State.findOne({ stateCode: req?.params?.code.toUpperCase() }).exec();
 
     if (!singleState.funfacts[req?.body?.index - 1]) {
         return res.status(204).json({ "message": `Invalid index reference to a funfact - index: ${req?.body?.index}.` });
@@ -68,7 +68,7 @@ const updateStateFunFact = async (req, res) => {
 
     if (VERIFIED_CODE != true) return VERIFIED_CODE;
 
-    const singleState = await State.findOne({ stateCode: req.params.code }).exec();
+    const singleState = await State.findOne({ stateCode: req.params.code.toUpperCase() }).exec();
 
     if (!singleState.funfacts[req.body.index - 1]) {
         return res.status(204).json({ "message": `Invalid index reference to a funfact - index: ${req.body.index}.` });
@@ -84,7 +84,7 @@ const getState = async (req, res) => {
     if (VERIFIED_CODE != true) return VERIFIED_CODE;
 
     const singleState = getJsonStateData(req?.params?.code);
-    const facts = await State.findOne({ stateCode: req.params.code }).exec();
+    const facts = await State.findOne({ stateCode: req.params.code.toUpperCase() }).exec();
     if (facts) singleState.funfacts = facts.funfacts;
     res.json(singleState);
 }
@@ -94,7 +94,7 @@ const getRandomFact = async (req, res) => {
 
     if (VERIFIED_CODE != true) return VERIFIED_CODE;
 
-    const singleState = await State.findOne({ stateCode: req.params.code }).exec();
+    const singleState = await State.findOne({ stateCode: req.params.code.toUpperCase() }).exec();
     if (!singleState.funfacts) return res.status(400).json({ "message": 'No funfacts for this state' });
     const randomFact = singleState.funfacts[Math.floor(Math.random() * singleState.funfacts.length)];
     res.json(randomFact);
@@ -138,7 +138,7 @@ const getStateAdmission = async (req, res) => {
 
 const getJsonStateData = (stateCode) => {
     for (var state in data.states){
-        if (data.states[state].code == stateCode) return data.states[state];
+        if (data.states[state].code == stateCode.toUpperCase()) return data.states[state];
     }
 }
 

@@ -2,7 +2,7 @@ const STATE_LIST = ["AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA","HI","ID",
 
 const verifyState = (req, res) => {
     for(state in STATE_LIST){        
-        if (STATE_LIST[state] == req?.params?.code) return true;
+        if (STATE_LIST[state] == req?.params?.code.toUpperCase()) return true;
     }
     if (!req?.params?.code) return res.status(400).json({ 'message': 'State code required.' });
     return res.status(400).json({"message":"Invalid state abbreviation parameter"});
