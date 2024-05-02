@@ -1,4 +1,5 @@
 {
+  "name": "BBylsmaBackEndWebDevFinal",
   "version": "1.0.0",
   "description": "class final project",
   "main": "server.js",
