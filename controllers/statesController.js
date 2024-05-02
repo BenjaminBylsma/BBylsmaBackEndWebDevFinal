@@ -73,8 +73,6 @@ const updateStateFunFact = async (req, res) => {
     if (!singleState.funfacts[req.body.index - 1]) {
         return res.status(204).json({ "message": `Invalid index reference to a funfact - index: ${req.body.index}.` });
     }
-    console.log(singleState);
-    console.log(req.body);
     singleState.funfacts[req.body.index - 1] = req.body.funfact;
     const result = singleState.save();
     res.json(singleState);
