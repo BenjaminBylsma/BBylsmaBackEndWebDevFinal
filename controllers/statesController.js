@@ -114,7 +114,7 @@ const getStateNickname = async (req, res) => {
 
     if (VERIFIED_CODE != true) return VERIFIED_CODE;
 
-    const singleState = await getJsonStateData(req?.params?.code);
+    const singleState = getJsonStateData(req?.params?.code);
     res.status(200).json({"state": singleState.state, "nickname": singleState.nickname});
 }
 
@@ -136,7 +136,7 @@ const getStateAdmission = async (req, res) => {
     res.json({"state": singleState.state, "admitted": singleState.admission_date});
 }
 
-const getJsonStateData = async (stateCode) => {
+const getJsonStateData = (stateCode) => {
     for (var state in data.states){
         if (data.states[state].code == stateCode.toUpperCase()) return data.states[state];
     }
