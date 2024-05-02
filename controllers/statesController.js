@@ -85,7 +85,7 @@ const getState = async (req, res) => {
 
     const singleState = getJsonStateData(req?.params?.code);
     const facts = await State.findOne({ stateCode: req.params.code }).exec();
-    if (facts) singleState.funfacts = facts;
+    if (facts) singleState.funfacts = facts.funfacts;
     res.json(singleState);
 }
 
