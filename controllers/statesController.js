@@ -115,7 +115,7 @@ const getStateNickname = async (req, res) => {
     if (VERIFIED_CODE != true) return VERIFIED_CODE;
 
     const singleState = getJsonStateData(req?.params?.code);
-    res.json({"state": singleState.state, "nickname": singleState.nickname});
+    res.status(200).json({"state": singleState.state, "nickname": singleState.nickname});
 }
 
 const getStatePopulation = async (req, res) => {
