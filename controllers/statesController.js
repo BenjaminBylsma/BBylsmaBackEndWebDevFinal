@@ -1,0 +1,156 @@
+const State = require('../model/State');
+const data = {};
+data.states = require('../model/statesData.json');
+const verify_state = require('../middleware/verifyStates');
+
+const getAllStates = async (req, res) => {
+    const statesList = [];
+    for(var state in data.states) {
+        if (req?.query){
+            if ((req?.query?.contig == 'false' && (data.states[state].code == "AK" || data.states[state].code == "HI")) ||
+                (req?.query?.contig == 'true' && (data.states[state].code != "AK" && data.states[state].code != "HI"))){
+                const singleState = await State.findOne({ stateCode: data.states[state].code }).exec();        
+                data.states[state]['funfacts'] = singleState?.funfacts;
+                statesList[statesList.length] = data.states[state];
+            }
+        } else {
+                const singleState = await State.findOne({ stateCode: data.states[state].code }).exec();        
+                data.states[state]['funfacts'] = singleState?.funfacts;
+                statesList[statesList.length] = data.states[state];
+        }
+    }
+    
+    if(!statesList) return res.status(400).json({ 'message': 'No states found.'});
+    res.json(statesList);
+}
+
+const createStateFunFact = async (req, res) => {
+    if (!req?.body?.funfact) {
+        return res.status(400).json({ 'message': 'Funfact text required.' });
+    }
+    const VERIFIED_CODE = verify_state(req, res);
+
+    if (VERIFIED_CODE != true) return VERIFIED;
+
+    const singleState = await State.findOne({ stateCode: req?.params?.code }).exec();
+    
+    singleState.funfacts[singleState.funfacts.length] = req.body.funfact;
+    const result = singleState.save();
+    res.json(singleState);
+}
+
+const removeStateFunFact = async (req, res) => {
+    const VERIFIED_CODE = verify_state(req, res);
+
+    if (VERIFIED_CODE != true) return VERIFIED;
+
+    const singleState = await State.findOne({ stateCode: req?.params?.code }).exec();
+
+    if (!singleState.funfacts[req?.body?.index - 1]) {
+        return res.status(204).json({ "message": `Invalid index reference to a funfact - index: ${req?.body?.index}.` });
+    }
+
+    var facts = [];
+    console.log(req?.body?.index);
+    for(var fact in singleState.funfacts){
+        if (!(fact == req?.body?.index - 1)){
+            facts[facts.length] = singleState.funfacts[fact];
+        }
+    }
+    console.log(facts);
+    singleState.funfacts = facts;
+    result = singleState.save();
+    res.json(singleState);
+}
+
+const updateStateFunFact = async (req, res) => {
+    const VERIFIED_CODE = await verify_state(req, res);
+
+    if (VERIFIED_CODE != true) return VERIFIED_CODE;
+
+    const singleState = await State.findOne({ stateCode: req.params.code }).exec();
+
+    if (!singleState.funfacts[req.body.index - 1]) {
+        return res.status(204).json({ "message": `Invalid index reference to a funfact - index: ${req.body.index}.` });
+    }
+    console.log(singleState);
+    console.log(req.body);
+    singleState.funfacts[req.body.index - 1] = req.body.funfact;
+    const result = singleState.save();
+    res.json(singleState);
+}
+
+const getState = async (req, res) => {
+    const VERIFIED_CODE = await verify_state(req, res);
+
+    if (VERIFIED_CODE != true) return VERIFIED_CODE;
+
+    const singleState = await State.findOne({ stateCode: req.params.code }).exec();
+    res.json(singleState);
+}
+
+const getRandomFact = async (req, res) => {
+    const VERIFIED_CODE = await verify_state(req, res);
+
+    if (VERIFIED_CODE != true) return VERIFIED_CODE;
+
+    const singleState = await State.findOne({ stateCode: req.params.code }).exec();
+    if (!singleState.funfacts) return res.status(400).json({ "message": 'No funfacts for this state' });
+    const randomFact = singleState.funfacts[Math.floor(Math.random() * singleState.funfacts.length)];
+    res.json(randomFact);
+}
+
+const getStateCapital = async (req, res) => {
+    const VERIFIED_CODE = await verify_state(req, res);
+
+    if (VERIFIED_CODE != true) return VERIFIED_CODE;
+
+    for (var state in data.states){
+        if (data.states[state].code == req?.params?.code) res.json({"state": data.states[state].state, "capital": data.states[state].capital_city});
+            
+    }
+}
+
+const getStateNickname = async (req, res) => {
+    const VERIFIED_CODE = await verify_state(req, res);
+
+    if (VERIFIED_CODE != true) return VERIFIED_CODE;
+
+    for (var state in data.states){
+        if (data.states[state].code == req?.params?.code) res.json({"state": data.states[state].state, "nickname": data.states[state].nickname});
+    }
+}
+
+const getStatePopulation = async (req, res) => {
+    const VERIFIED_CODE = await verify_state(req, res);
+
+    if (VERIFIED_CODE != true) return VERIFIED_CODE;
+
+    for (var state in data.states){
+        if (data.states[state].code == req?.params?.code) res.json({"state": data.states[state].state, "population": data.states[state].population});
+    }
+}
+
+const getStateAdmission = async (req, res) => {
+    const VERIFIED_CODE = await verify_state(req, res);
+
+    if (VERIFIED_CODE != true) return VERIFIED_CODE;
+
+    for (var state in data.states){
+        if (data.states[state].code == req?.params?.code) res.json({"state": data.states[state].state, "admitted": data.states[state].admission_date});
+    }
+}
+
+
+module.exports = {
+    getAllStates,
+    createStateFunFact,
+    removeStateFunFact,
+    updateStateFunFact,
+    getState,
+    getRandomFact,
+    getStateCapital,
+    getStateNickname,
+    getStatePopulation,
+    getStateAdmission
+}
