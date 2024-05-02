@@ -6,7 +6,7 @@ const verify_state = require('../middleware/verifyStates');
 const getAllStates = async (req, res) => {
     const statesList = [];
     for(var state in data.states) {
-        if (req?.query){
+        if (req?.query?.contig != null){
             if ((req?.query?.contig == 'false' && (data.states[state].code == "AK" || data.states[state].code == "HI")) ||
                 (req?.query?.contig == 'true' && (data.states[state].code != "AK" && data.states[state].code != "HI"))){
                 const singleState = await State.findOne({ stateCode: data.states[state].code }).exec();        
