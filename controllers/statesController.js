@@ -85,7 +85,8 @@ const getState = async (req, res) => {
 
     if (VERIFIED_CODE != true) return VERIFIED_CODE;
 
-    const singleState = await State.findOne({ stateCode: req.params.code }).exec();
+    const singleState = getJsonStateData(req?.params?.code);
+    singleState.funfacts = await State.findOne({ stateCode: req.params.code }).exec();
     res.json(singleState);
 }
 
@@ -105,10 +106,8 @@ const getStateCapital = async (req, res) => {
 
     if (VERIFIED_CODE != true) return VERIFIED_CODE;
 
-    for (var state in data.states){
-        if (data.states[state].code == req?.params?.code) res.json({"state": data.states[state].state, "capital": data.states[state].capital_city});
-            
-    }
+    const singleState = getJsonStateData(req?.params?.code);
+    res.json({"state": singleState.state, "capital": singleState.capital_city});
 }
 
 const getStateNickname = async (req, res) => {
@@ -116,9 +115,8 @@ const getStateNickname = async (req, res) => {
 
     if (VERIFIED_CODE != true) return VERIFIED_CODE;
 
-    for (var state in data.states){
-        if (data.states[state].code == req?.params?.code) res.json({"state": data.states[state].state, "nickname": data.states[state].nickname});
-    }
+    const singleState = getJsonStateData(req?.params?.code);
+    res.json({"state": singleState.state, "nickname": singleState.nickname});
 }
 
 const getStatePopulation = async (req, res) => {
@@ -126,9 +124,8 @@ const getStatePopulation = async (req, res) => {
 
     if (VERIFIED_CODE != true) return VERIFIED_CODE;
 
-    for (var state in data.states){
-        if (data.states[state].code == req?.params?.code) res.json({"state": data.states[state].state, "population": data.states[state].population});
-    }
+    const singleState = getJsonStateData(req?.params?.code);
+    res.json({"state": singleState.state, "population": singleState.population});
 }
 
 const getStateAdmission = async (req, res) => {
@@ -136,8 +133,13 @@ const getStateAdmission = async (req, res) => {
 
     if (VERIFIED_CODE != true) return VERIFIED_CODE;
 
+    const singleState = getJsonStateData(req?.params?.code);
+    res.json({"state": singleState.state, "admitted": singleState.admission_date});
+}
+
+const getJsonStateData = (stateCode) => {
     for (var state in data.states){
-        if (data.states[state].code == req?.params?.code) res.json({"state": data.states[state].state, "admitted": data.states[state].admission_date});
+        if (data.states[state].code == stateCode) return data.states[state];
     }
 }
 
