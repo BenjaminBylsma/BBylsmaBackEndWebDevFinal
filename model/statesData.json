@@ -60,7 +60,8 @@
       "landscape_background_url": "https://cdn.civil.services/us-states/backgrounds/1280x720/landscape/arizona.jpg",
       "skyline_background_url": "https://cdn.civil.services/us-states/backgrounds/1280x720/skyline/arizona.jpg",
       "twitter_url": null,
-      "facebook_url": null
+      "facebook_url": null,
+      "funfacts": []
     },
     {
       "state": "Arkansas",
