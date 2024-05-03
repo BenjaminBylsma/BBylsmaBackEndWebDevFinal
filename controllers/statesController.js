@@ -20,8 +20,9 @@ const getAllStates = async (req, res) => {
         }
     }
     
-    if(!statesList) return res.status(400).json({ 'message': 'No states found.'});
-    res.status(200).json(statesList);
+    if(!statesList) return res.status(400).json({ 'message': 'No states found.'})
+    const result = statesList.to
+    res.status(200).json(stat);
 }
 
 const createStateFunFact = async (req, res) => {
@@ -57,7 +58,7 @@ const removeStateFunFact = async (req, res) => {
         }
     }
     stateFacts.funfacts = facts;
-    result = stateFacts.save();
+    const result = stateFacts.save();    
     res.json(stateFacts);
 }
 
@@ -72,7 +73,6 @@ const updateStateFunFact = async (req, res) => {
     if (!stateFacts.funfacts[req.body.index - 1]) return res.status(400).json({ "message": `No Fun Fact found at that index for ${singleState.state}` });
     stateFacts.funfacts[req.body.index - 1] = req.body.funfact;
     const result = stateFacts.save();
-
     res.json({"state": stateFacts.stateCode,
     "funfact": req.body.funfact,
     "index": req.body.index-1,
