@@ -7,14 +7,14 @@ const getAllStates = async (req, res) => {
     if (req?.query?.contig == 'false'){
         const alaska = getJsonStateData("AK");
         const hawaii = getJsonStateData("HI");
-        alaska['funfacts'] = findStateFunfacts("AK", false);
-        hawaii['funfacts'] = findStateFunfacts("HI", false);
+        alaska['funfacts'] = getStateFunfacts("AK", false);
+        hawaii['funfacts'] = getStateFunfacts("HI", false);
         return res.json([alaska, hawaii]);
     }
     var statesList = [];
     for(var state in data.states) {
         const stateData = getJsonStateData(data.states[state].code);
-            stateData['funfacts'] = await findStateFunfacts(stateData.code, false);
+            stateData['funfacts'] = await getStateFunfacts(stateData.code, false);
         if (req?.query?.contig == null){            
             statesList[statesList.length] = stateData;            
         } else if (req?.query?.contig == 'true' && (stateData.code != "AK" && stateData.code != "HI")){                    
