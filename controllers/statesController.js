@@ -25,30 +25,32 @@ const getAllStates = async (req, res) => {
 }
 
 const createStateFunFact = async (req, res) => {
-    if (!req?.body?.funfact) {
-        return res.status(400).json({ 'message': 'Funfact text required.' });
-    }
+    if(!req?.body?.funfacts) return res.status(400).json({"message": "State fun facts value required"});
+    if(!Array.isArray(req?.body?.funfacts)) return res.status(400).json({"message": "State fun facts value must be an array"});
+
     const VERIFIED_CODE = verify_state(req, res);
 
     if (VERIFIED_CODE != true) return VERIFIED;
 
     const stateFacts = await State.findOne({ stateCode: req?.params?.code.toUpperCase() }).exec();
     if (!stateFacts){
-        const newStateFacts = await State.create({ stateCode: req?.params?.code.toUpperCase(), funfacts: req?.body?.funfact });        
+        const newStateFacts = await State.create({ stateCode: req?.params?.code.toUpperCase(), funfacts: req?.body?.funfacts });        
         return res.json(newStateFacts);
     }
     
-    stateFacts.funfacts[stateFacts.funfacts.length] = req.body.funfact;
+    for(var fact in req.body.funfacts){
+        stateFacts.funfacts[stateFacts.funfacts.length] = req.body.funfacts[fact];
+    }    
     var result = await stateFacts.save();
     res.json(result);
 }
 
 const removeStateFunFact = async (req, res) => {
+    if(!req?.body?.index) return res.status(400).json({"message": "State fun fact index value required"})
+
     const VERIFIED_CODE = verify_state(req, res);
 
     if (VERIFIED_CODE != true) return VERIFIED;
-    const singleState = getJsonStateData(req?.params?.code);
-    const stateFacts = await State.findOne({ stateCode: req?.params?.code.toUpperCase() }).exec();
 
     if (!stateFacts) return res.status(400).json({"message": `No Fun Facts found for ${singleState.state}`});
     if (!stateFacts.funfacts[req?.body?.index - 1]) return res.status(400).json({ "message": `No Fun Fact found at that index for ${singleState.state}` });
@@ -72,9 +74,13 @@ const removeStateFunFact = async (req, res) => {
 }
 
 const updateStateFunFact = async (req, res) => {
+    if(!req?.body?.index) return res.status(400).json({"message": "State fun fact index value required"})
+    if(!req?.body?.funfact) return res.status(400).json({"message": "State fun fact value required"});
+
     const VERIFIED_CODE = await verify_state(req, res);
 
     if (VERIFIED_CODE != true) return VERIFIED_CODE;
+
     const singleState = getJsonStateData(req?.params?.code.toUpperCase());
     const stateFacts = await State.findOne({ stateCode: req.params.code.toUpperCase() }).exec();
 
@@ -101,6 +107,7 @@ const getRandomFact = async (req, res) => {
     const VERIFIED_CODE = await verify_state(req, res);
 
     if (VERIFIED_CODE != true) return VERIFIED_CODE;
+    
     const singleState = getJsonStateData(req?.params?.code);
     const stateFacts = await State.findOne({ stateCode: req.params.code.toUpperCase() }).exec();
 
