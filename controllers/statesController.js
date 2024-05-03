@@ -22,7 +22,7 @@ const getAllStates = async (req, res) => {
     
     if(!statesList) return res.status(400).json({ 'message': 'No states found.'})
     const result = statesList.to
-    res.status(200).json(stat);
+    res.status(200).json(statesList);
 }
 
 const createStateFunFact = async (req, res) => {
