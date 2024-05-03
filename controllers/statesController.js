@@ -50,7 +50,9 @@ const removeStateFunFact = async (req, res) => {
 
     const VERIFIED_CODE = verify_state(req, res);
 
-    if (VERIFIED_CODE != true) return VERIFIED;
+    if (VERIFIED_CODE != true) return VERIFIED_CODE;
+    
+    const stateFacts = await State.findOne({ stateCode: req?.params?.code.toUpperCase() }).exec();
 
     if (!stateFacts) return res.status(400).json({"message": `No Fun Facts found for ${singleState.state}`});
     if (!stateFacts.funfacts[req?.body?.index - 1]) return res.status(400).json({ "message": `No Fun Fact found at that index for ${singleState.state}` });
@@ -107,7 +109,7 @@ const getRandomFact = async (req, res) => {
     const VERIFIED_CODE = await verify_state(req, res);
 
     if (VERIFIED_CODE != true) return VERIFIED_CODE;
-    
+
     const singleState = getJsonStateData(req?.params?.code);
     const stateFacts = await State.findOne({ stateCode: req.params.code.toUpperCase() }).exec();
 
