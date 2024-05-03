@@ -4,15 +4,20 @@ data.states = require('../model/statesData.json');
 const verify_state = require('../middleware/verifyStates');
 
 const getAllStates = async (req, res) => {
+    if (req?.query?.contig == 'false'){
+        const alaska = getJsonStateData("AK");
+        const hawaii = getJsonStateData("HI");
+        alaska['funfacts'] = await State.findOne({ stateCode: "AK"}).exec();
+        hawaii['funfacts'] = await State.findOne({ stateCode: "HI"}).exec();        
+        return res.json([alaska, hawaii]);
+    }
     const statesList = [];
     for(var state in data.states) {
         const singleState = await State.findOne({ stateCode: data.states[state].code }).exec();        
         data.states[state]['funfacts'] = singleState?.funfacts;
-        
+
         if (req?.query?.contig == null){            
             statesList[statesList.length] = data.states[state];            
-        } else  if (req?.query?.contig == 'false' && (data.states[state].code == "AK" || data.states[state].code == "HI")){
-            statesList[statesList.length] = data.states[state];    
         } else if (req?.query?.contig == 'true' && (data.states[state].code != "AK" && data.states[state].code != "HI")){                    
             statesList[statesList.length] = data.states[state];                
         }        
