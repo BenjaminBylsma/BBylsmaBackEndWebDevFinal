@@ -39,7 +39,7 @@ const createStateFunFact = async (req, res) => {
     }
     
     stateFacts.funfacts[stateFacts.funfacts.length] = req.body.funfact;
-    const result = await stateFacts.save();
+    var result = await stateFacts.save();
     res.json(result);
 }
 
@@ -81,7 +81,7 @@ const updateStateFunFact = async (req, res) => {
     if (!stateFacts) return res.status(400).json({"message": `No Fun Facts found for ${singleState.state}`});
     if (!stateFacts.funfacts[req.body.index - 1]) return res.status(400).json({ "message": `No Fun Fact found at that index for ${singleState.state}` });
     stateFacts.funfacts[req.body.index - 1] = req.body.funfact;
-    const result = await stateFacts.save();
+    var result = await stateFacts.save();
     res.json(result);
 }
 
