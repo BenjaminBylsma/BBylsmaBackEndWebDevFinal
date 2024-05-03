@@ -7,19 +7,18 @@ const getAllStates = async (req, res) => {
     if (req?.query?.contig == 'false'){
         const alaska = getJsonStateData("AK");
         const hawaii = getJsonStateData("HI");
-        alaska['funfacts'] = await State.findOne({ stateCode: "AK"}).exec();
-        hawaii['funfacts'] = await State.findOne({ stateCode: "HI"}).exec();        
+        alaska['funfacts'] = findStateFunfacts("AK", false);
+        hawaii['funfacts'] = findStateFunfacts("HI", false);
         return res.json([alaska, hawaii]);
     }
     var statesList = [];
     for(var state in data.states) {
-        const singleState = await State.findOne({ stateCode: data.states[state].code }).exec();        
-        data.states[state]['funfacts'] = !singleState ? [] : singleState.funfacts;
-
+        const stateData = getJsonStateData(data.states[state].code);
+            stateData['funfacts'] = await findStateFunfacts(stateData.code, false);
         if (req?.query?.contig == null){            
-            statesList[statesList.length] = data.states[state];            
-        } else if (req?.query?.contig == 'true' && (data.states[state].code != "AK" && data.states[state].code != "HI")){                    
-            statesList[statesList.length] = data.states[state];                
+            statesList[statesList.length] = stateData;            
+        } else if (req?.query?.contig == 'true' && (stateData.code != "AK" && stateData.code != "HI")){                    
+            statesList[statesList.length] = stateData;                
         }        
     }
     
@@ -35,7 +34,7 @@ const createStateFunFact = async (req, res) => {
 
     if (VERIFIED_CODE != true) return VERIFIED;
 
-    const stateFacts = await State.findOne({ stateCode: req?.params?.code.toUpperCase() }).exec();
+    const stateFacts = await getStateFunfacts(req?.params?.code, true);
     if (!stateFacts){
         const newStateFacts = await State.create({ stateCode: req?.params?.code.toUpperCase(), funfacts: req?.body?.funfacts });        
         return res.json(newStateFacts);
@@ -56,7 +55,7 @@ const removeStateFunFact = async (req, res) => {
     if (VERIFIED_CODE != true) return VERIFIED_CODE;
 
     const singleState = getJsonStateData(req?.params?.code.toUpperCase());
-    const stateFacts = await State.findOne({ stateCode: req.params.code.toUpperCase() }).exec();
+    const stateFacts = await getStateFunfacts(req?.params?.code, true);
 
     if (!stateFacts) return res.status(404).json({"message": `No Fun Facts found for ${singleState.state}`});
     if (!stateFacts.funfacts[req?.body?.index - 1]) return res.status(404).json({ "message": `No Fun Fact found at that index for ${singleState.state}` });
@@ -87,7 +86,7 @@ const updateStateFunFact = async (req, res) => {
     if (VERIFIED_CODE != true) return VERIFIED_CODE;
 
     const singleState = getJsonStateData(req?.params?.code.toUpperCase());
-    const stateFacts = await State.findOne({ stateCode: req.params.code.toUpperCase() }).exec();
+    const stateFacts = await getStateFunfacts(req?.params?.code, true);
 
     if (!stateFacts) return res.status(404).json({"message": `No Fun Facts found for ${singleState.state}`});
     if (!stateFacts.funfacts[req.body.index - 1]) return res.status(404).json({ "message": `No Fun Fact found at that index for ${singleState.state}` });
@@ -102,9 +101,9 @@ const getState = async (req, res) => {
     if (VERIFIED_CODE != true) return VERIFIED_CODE;
 
     const singleState = getJsonStateData(req?.params?.code);
-    const stateFacts = await State.findOne({ stateCode: req.params.code.toUpperCase() }).exec();
+    const stateFacts = await getStateFunfacts(req?.params?.code, false);
 
-    if (stateFacts) singleState.funfacts = stateFacts.funfacts;
+    if (stateFacts) singleState.funfacts = stateFacts;
     res.json(singleState);
 }
 
@@ -114,10 +113,10 @@ const getRandomFact = async (req, res) => {
     if (VERIFIED_CODE != true) return VERIFIED_CODE;
 
     const singleState = getJsonStateData(req?.params?.code);
-    const stateFacts = await State.findOne({ stateCode: req.params.code.toUpperCase() }).exec();
+    const stateFacts = await getStateFunfacts(req?.params?.code, false);
 
     if (!stateFacts) return res.status(404).json({ "message": `No Fun Facts found for ${singleState.state}` });
-    const randomFact = stateFacts.funfacts[Math.floor(Math.random() * stateFacts.funfacts.length)];
+    const randomFact = stateFacts[Math.floor(Math.random() * stateFacts.length)];
     res.json({"funfact": randomFact});
 }
 
@@ -157,10 +156,15 @@ const getStateAdmission = async (req, res) => {
     res.json({"state": singleState.state, "admitted": singleState.admission_date});
 }
 
-const getJsonStateData = (stateCode) => {
+const getJsonStateData = (state_code) => {
     for (var state in data.states){
-        if (data.states[state].code == stateCode.toUpperCase()) return data.states[state];
+        if (data.states[state].code == state_code.toUpperCase()) return data.states[state];
     }
+}
+const getStateFunfacts = async (state_code, db_operation) => {
+    const stateFacts = await State.findOne({ stateCode: state_code.toUpperCase() }).exec(); 
+    
+    return (db_operation) ? stateFacts : stateFacts?.funfacts;
 }
 
 
