@@ -92,9 +92,9 @@ const getRandomFact = async (req, res) => {
 
     if (VERIFIED_CODE != true) return VERIFIED_CODE;
 
-    const singleState = await State.findOne({ stateCode: req.params.code.toUpperCase() }).exec();
-    if (!singleState.funfacts) return res.status(400).json({ "message": 'No funfacts for this state' });
-    const randomFact = singleState.funfacts[Math.floor(Math.random() * singleState.funfacts.length)];
+    const stateFacts = await State.findOne({ stateCode: req.params.code.toUpperCase() }).exec();
+    if (!stateFacts) return res.status(400).json({ "message": 'No funfacts for this state' });
+    const randomFact = stateFacts.funfacts[Math.floor(Math.random() * stateFacts.funfacts.length)];
     res.json(randomFact);
 }
 
