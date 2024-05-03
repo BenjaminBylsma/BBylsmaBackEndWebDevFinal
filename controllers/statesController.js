@@ -59,7 +59,6 @@ const removeStateFunFact = async (req, res) => {
     if (!stateFacts.funfacts[req?.body?.index - 1]) return res.status(404).json({ "message": `No Fun Fact found at that index for ${singleState.state}` });
 
     var facts = [];
-    console.log(req?.body?.index);
     for(var fact in stateFacts.funfacts){
         if (!(fact == req?.body?.index - 1)){
             facts[facts.length] = stateFacts.funfacts[fact];
