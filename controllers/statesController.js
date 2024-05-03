@@ -133,7 +133,7 @@ const getStatePopulation = async (req, res) => {
     if (VERIFIED_CODE != true) return VERIFIED_CODE;
 
     const singleState = getJsonStateData(req?.params?.code);
-    res.json({"state": singleState.state, "population": singleState.population});
+    res.json({"state": singleState.state, "population": singleState.population.toLocaleString()});
 }
 
 const getStateAdmission = async (req, res) => {
