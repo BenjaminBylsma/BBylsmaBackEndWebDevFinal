@@ -116,7 +116,7 @@ const getRandomFact = async (req, res) => {
 
     if (!stateFacts) return res.status(400).json({ "message": `No Fun Facts found for ${singleState.state}` });
     const randomFact = stateFacts.funfacts[Math.floor(Math.random() * stateFacts.funfacts.length)];
-    res.json(randomFact);
+    res.json({"funfact": randomFact});
 }
 
 const getStateCapital = async (req, res) => {
