@@ -11,7 +11,7 @@ const getAllStates = async (req, res) => {
         hawaii['funfacts'] = await State.findOne({ stateCode: "HI"}).exec();        
         return res.json([alaska, hawaii]);
     }
-    const statesList = [];
+    var statesList = [];
     for(var state in data.states) {
         const singleState = await State.findOne({ stateCode: data.states[state].code }).exec();        
         data.states[state]['funfacts'] = !singleState ? [] : singleState.funfacts;
