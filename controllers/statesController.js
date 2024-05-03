@@ -32,11 +32,11 @@ const createStateFunFact = async (req, res) => {
 
     if (VERIFIED_CODE != true) return VERIFIED;
 
-    const singleState = await State.findOne({ stateCode: req?.params?.code.toUpperCase() }).exec();
+    const stateFacts = await State.findOne({ stateCode: req?.params?.code.toUpperCase() }).exec();
     
-    singleState.funfacts[singleState.funfacts.length] = req.body.funfact;
-    const result = singleState.save();
-    res.json(singleState);
+    stateFacts.funfacts[stateFacts.funfacts.length] = req.body.funfact;
+    const result = stateFacts.save();
+    res.json(stateFacts);
 }
 
 const removeStateFunFact = async (req, res) => {
@@ -51,14 +51,14 @@ const removeStateFunFact = async (req, res) => {
 
     var facts = [];
     console.log(req?.body?.index);
-    for(var fact in singleState.funfacts){
+    for(var fact in stateFacts.funfacts){
         if (!(fact == req?.body?.index - 1)){
-            facts[facts.length] = singleState.funfacts[fact];
+            facts[facts.length] = stateFacts.funfacts[fact];
         }
     }
-    singleState.funfacts = facts;
-    result = singleState.save();
-    res.json(singleState);
+    stateFacts.funfacts = facts;
+    result = stateFacts.save();
+    res.json(stateFacts);
 }
 
 const updateStateFunFact = async (req, res) => {
@@ -69,10 +69,14 @@ const updateStateFunFact = async (req, res) => {
     const stateFacts = await State.findOne({ stateCode: req.params.code.toUpperCase() }).exec();
 
     if (!stateFacts) return res.status(400).json({"message": `No Fun Facts found for ${singleState.state}`});
-    if (!singleState.funfacts[req.body.index - 1]) return res.status(400).json({ "message": `No Fun Fact found at that index for ${singleState.state}` });
-    singleState.funfacts[req.body.index - 1] = req.body.funfact;
-    const result = singleState.save();
-    res.json(singleState);
+    if (!stateFacts.funfacts[req.body.index - 1]) return res.status(400).json({ "message": `No Fun Fact found at that index for ${singleState.state}` });
+    stateFacts.funfacts[req.body.index - 1] = req.body.funfact;
+    const result = stateFacts.save();
+
+    res.json({"state": stateFacts.stateCode,
+    "funfact": req.body.funfact,
+    "index": req.body.index-1,
+    "-v": "stable"});
 }
 
 const getState = async (req, res) => {
