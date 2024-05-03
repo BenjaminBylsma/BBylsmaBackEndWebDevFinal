@@ -21,7 +21,7 @@ const getAllStates = async (req, res) => {
     }
     
     if(!statesList) return res.status(400).json({ 'message': 'No states found.'})
-    res.status(200).json(statesList);
+    res.json(statesList);
 }
 
 const createStateFunFact = async (req, res) => {
@@ -55,8 +55,8 @@ const removeStateFunFact = async (req, res) => {
     const singleState = getJsonStateData(req?.params?.code.toUpperCase());
     const stateFacts = await State.findOne({ stateCode: req.params.code.toUpperCase() }).exec();
 
-    if (!stateFacts) return res.status(400).json({"message": `No Fun Facts found for ${singleState.state}`});
-    if (!stateFacts.funfacts[req?.body?.index - 1]) return res.status(400).json({ "message": `No Fun Fact found at that index for ${singleState.state}` });
+    if (!stateFacts) return res.status(404).json({"message": `No Fun Facts found for ${singleState.state}`});
+    if (!stateFacts.funfacts[req?.body?.index - 1]) return res.status(404).json({ "message": `No Fun Fact found at that index for ${singleState.state}` });
 
     var facts = [];
     console.log(req?.body?.index);
@@ -87,8 +87,8 @@ const updateStateFunFact = async (req, res) => {
     const singleState = getJsonStateData(req?.params?.code.toUpperCase());
     const stateFacts = await State.findOne({ stateCode: req.params.code.toUpperCase() }).exec();
 
-    if (!stateFacts) return res.status(400).json({"message": `No Fun Facts found for ${singleState.state}`});
-    if (!stateFacts.funfacts[req.body.index - 1]) return res.status(400).json({ "message": `No Fun Fact found at that index for ${singleState.state}` });
+    if (!stateFacts) return res.status(404).json({"message": `No Fun Facts found for ${singleState.state}`});
+    if (!stateFacts.funfacts[req.body.index - 1]) return res.status(404).json({ "message": `No Fun Fact found at that index for ${singleState.state}` });
     stateFacts.funfacts[req.body.index - 1] = req.body.funfact;
     var result = await stateFacts.save();
     res.json(result);
@@ -114,7 +114,7 @@ const getRandomFact = async (req, res) => {
     const singleState = getJsonStateData(req?.params?.code);
     const stateFacts = await State.findOne({ stateCode: req.params.code.toUpperCase() }).exec();
 
-    if (!stateFacts) return res.status(400).json({ "message": `No Fun Facts found for ${singleState.state}` });
+    if (!stateFacts) return res.status(404).json({ "message": `No Fun Facts found for ${singleState.state}` });
     const randomFact = stateFacts.funfacts[Math.floor(Math.random() * stateFacts.funfacts.length)];
     res.json({"funfact": randomFact});
 }
