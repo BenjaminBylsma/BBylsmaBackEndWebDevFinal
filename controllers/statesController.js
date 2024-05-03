@@ -57,7 +57,6 @@ const removeStateFunFact = async (req, res) => {
             facts[facts.length] = singleState.funfacts[fact];
         }
     }
-    console.log(facts);
     singleState.funfacts = facts;
     result = singleState.save();
     res.json(singleState);
@@ -67,12 +66,11 @@ const updateStateFunFact = async (req, res) => {
     const VERIFIED_CODE = await verify_state(req, res);
 
     if (VERIFIED_CODE != true) return VERIFIED_CODE;
+    const singleState = getJsonStateData(req?.params?.code.toUpperCase());
+    const stateFacts = await State.findOne({ stateCode: req.params.code.toUpperCase() }).exec();
 
-    const singleState = await State.findOne({ stateCode: req.params.code.toUpperCase() }).exec();
-
-    if (!singleState.funfacts[req.body.index - 1]) {
-        return res.status(204).json({ "message": `Invalid index reference to a funfact - index: ${req.body.index}.` });
-    }
+    if (!stateFacts.funfacts) return res.status(400).json({"message": `No funfacts found for ${singleState.state}`});
+    if (!singleState.funfacts[req.body.index - 1]) return res.status(400).json({ "message": `Invalid index reference to a funfact - index: ${req.body.index}.` });
     singleState.funfacts[req.body.index - 1] = req.body.funfact;
     const result = singleState.save();
     res.json(singleState);
@@ -84,8 +82,8 @@ const getState = async (req, res) => {
     if (VERIFIED_CODE != true) return VERIFIED_CODE;
 
     const singleState = getJsonStateData(req?.params?.code);
-    const facts = await State.findOne({ stateCode: req.params.code.toUpperCase() }).exec();
-    if (facts) singleState.funfacts = facts.funfacts;
+    const stateFacts = await State.findOne({ stateCode: req.params.code.toUpperCase() }).exec();
+    if (stateFacts) singleState.funfacts = stateFacts.funfacts;
     res.json(singleState);
 }
 
