@@ -69,7 +69,7 @@ const updateStateFunFact = async (req, res) => {
     const singleState = getJsonStateData(req?.params?.code.toUpperCase());
     const stateFacts = await State.findOne({ stateCode: req.params.code.toUpperCase() }).exec();
 
-    if (!stateFacts.funfacts) return res.status(400).json({"message": `No funfacts found for ${singleState.state}`});
+    if (!stateFacts) return res.status(400).json({"message": `No funfacts found for ${singleState.state}`});
     if (!singleState.funfacts[req.body.index - 1]) return res.status(400).json({ "message": `Invalid index reference to a funfact - index: ${req.body.index}.` });
     singleState.funfacts[req.body.index - 1] = req.body.funfact;
     const result = singleState.save();
