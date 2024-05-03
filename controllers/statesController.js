@@ -14,7 +14,7 @@ const getAllStates = async (req, res) => {
     const statesList = [];
     for(var state in data.states) {
         const singleState = await State.findOne({ stateCode: data.states[state].code }).exec();        
-        data.states[state]['funfacts'] = singleState?.funfacts;
+        data.states[state]['funfacts'] = !singleState ? [] : singleState.funfacts;
 
         if (req?.query?.contig == null){            
             statesList[statesList.length] = data.states[state];            
